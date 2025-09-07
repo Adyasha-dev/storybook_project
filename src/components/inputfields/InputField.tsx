@@ -1,7 +1,23 @@
 "use client";
 import React, { useState } from "react";
-import type { InputFieldProps } from "../inputfields/InputField.types";
 import { Eye, EyeOff, X } from "lucide-react";
+
+export interface InputFieldProps {
+  value?: string;
+  onChange: (value: string) => void; // simplified
+  label?: string;
+  placeholder?: string;
+  helperText?: string;
+  errorMessage?: string;
+  disabled?: boolean;
+  invalid?: boolean;
+  loading?: boolean;
+  type?: "text" | "password";
+  showClearButton?: boolean;
+  showPasswordToggle?: boolean;
+  variant?: "filled" | "outlined" | "ghost";
+  size?: "sm" | "md" | "lg";
+}
 
 const InputField: React.FC<InputFieldProps> = ({
   value = "",
@@ -19,37 +35,25 @@ const InputField: React.FC<InputFieldProps> = ({
   variant = "ghost",
   size = "md",
 }) => {
-  const [inputValue, setInputValue] = useState(value);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Size classes
   const sizeClasses: Record<"sm" | "md" | "lg", string> = {
     sm: "h-8 px-2 text-sm",
     md: "h-10 px-3 text-base",
     lg: "h-12 px-4 text-lg",
   };
 
-  // Variant classes
   const variantClasses: Record<"filled" | "outlined" | "ghost", string> = {
     filled:
-      "bg-gray-100 border border-transparent focus:ring-2 focus:ring-blue-500 focus:border-blue-500", // light background
+      "bg-gray-100 border border-transparent focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
     outlined:
-      "bg-white border border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500", // clear white, solid border
+      "bg-white border border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
     ghost:
-      "bg-transparent border-b border-gray-400 rounded-none focus:border-blue-500 focus:ring-0", // only bottom border
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    onChange?.(e); // still notify parent if provided
+      "bg-transparent border-b border-gray-400 rounded-none focus:border-blue-500 focus:ring-0",
   };
 
   const handleClear = () => {
-    setInputValue("");
-    // also notify parent that value is cleared
-    onChange?.({
-      target: { value: "" },
-    } as React.ChangeEvent<HTMLInputElement>);
+    onChange(""); // ✅ directly update parent state
   };
 
   return (
@@ -63,8 +67,8 @@ const InputField: React.FC<InputFieldProps> = ({
       <div className="relative flex items-center">
         <input
           type={showPasswordToggle && showPassword ? "text" : type}
-          value={inputValue}
-          onChange={handleChange}
+          value={value}
+          onChange={(e) => onChange(e.target.value)} // ✅ simplified
           placeholder={placeholder}
           disabled={disabled || loading}
           className={`
@@ -81,7 +85,7 @@ const InputField: React.FC<InputFieldProps> = ({
         />
 
         {/* Clear Button */}
-        {showClearButton && inputValue && (
+        {showClearButton && value && (
           <button
             type="button"
             onClick={handleClear}
@@ -103,7 +107,6 @@ const InputField: React.FC<InputFieldProps> = ({
         )}
       </div>
 
-      {/* Loading / Error / Helper text */}
       {loading && <span className="text-xs text-gray-500">Loading...</span>}
       {invalid && errorMessage && (
         <span className="text-xs text-red-500">{errorMessage}</span>
