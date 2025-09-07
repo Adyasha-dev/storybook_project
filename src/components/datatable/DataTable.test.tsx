@@ -4,7 +4,6 @@
  * Ensure you have jest + @testing-library/react configured in your project.
  */
 
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import DataTable from "./DataTable";
